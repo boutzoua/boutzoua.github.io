@@ -59,9 +59,9 @@
 		/*  HIDE HEADER WHEN PORTFOLIO SLIDESHOW OPENED
         /* ----------------------------------------------------------- */
 
-		$(".grid figure").on('click', function() {
-			$("#navbar-collapse-toggle").addClass('hide-header');
-		});
+		// $(".grid figure").on('click', function() {
+		// 	$("#navbar-collapse-toggle").addClass('hide-header');
+		// });
 
 		/* ----------------------------------------------------------- */
 		/*  SHOW HEADER WHEN PORTFOLIO SLIDESHOW CLOSED
