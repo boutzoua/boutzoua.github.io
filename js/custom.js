@@ -95,23 +95,20 @@
 		/*  AJAX CONTACT FORM
         /* ----------------------------------------------------------- */
 		  	// Your web app's Firebase configuration
-		var firebaseConfig = {
-			apiKey: "AIzaSyDnQRLw_I0Dv-xtLn2D4vdQ8VrP5GWIbko",
-			authDomain: "send-email-b9317.firebaseapp.com",
-			projectId: "send-email-b9317",
-			storageBucket: "send-email-b9317.appspot.com",
-			messagingSenderId: "198683175873",
-			appId: "1:198683175873:web:00b6b9969c6c2f06ec5d40"
-		};
-		// Initialize Firebase
-		firebase.initializeApp(firebaseConfig);
-		
-		// Refernece contactInfo collections
-		let contactInfo = firebase.database().ref("infos");
-		
-		// Listen for a submit
-		document.querySelector(".contactform").addEventListener("submit", submitForm);
-		
+		// const firebaseConfig = {
+		// 	apiKey: "AIzaSyAwoTXZUAi7yDLDj2w9jSTmTVI_epeB8co",
+		// 	authDomain: "mustaphaport-6dee7.firebaseapp.com",
+		// 	projectId: "mustaphaport-6dee7",
+		// 	storageBucket: "mustaphaport-6dee7.appspot.com",
+		// 	messagingSenderId: "437671133745",
+		// 	appId: "1:437671133745:web:f3b15036edf6665c740b10"
+		// };
+		// // Initialize Firebase
+		// firebase.initializeApp(firebaseConfig);
+		//
+		// // Refernece contactInfo collections
+		// var contactInfo = firebase.database().ref("infos");
+
 		function submitForm(e) {
 			e.preventDefault();
 		
@@ -121,9 +118,9 @@
 			let subject = document.querySelector(".subject").value;
 			let message = document.querySelector(".message").value;
 			console.log(name, email, message);
-		
-			saveContactInfo(name, email, subject, message);
-		
+
+			// saveMessage(name, email, subject, message);
+
 			document.querySelector(".contactform").reset();
 			sendEmail(name, email, subject, message);
 		}
@@ -139,69 +136,128 @@
 			message: message,
 			});
 		}
+		function saveMessage(name, email, subject, message){
+			contactInfo
+				.add({
+					name: name,
+					email: email,
+					subject: subject,
+					message: message,
+				})
+				.then(function (docRef) {
+					console.log("Document written with ID: ", docRef.id);
+					console.log(email);
+				})
+				.catch(function (error) {
+					console.error("Error adding docum	ent: ", error);
+				});
+		}
 
 		//Send Email Info
 		function sendEmail(name, email, subject, message){
-			Email.send({
-				Host: "smtp.gmail.com",
-				Username: "m.boutzoua01@gmail.com",
-				Password: "mdkfzoxajulfhhda",
-				To: "m.boutzoua01@gmail.com",
-				From: email,
-				Subject: subject,
-				Body: `Name: ${name} <br/> Email: ${email} <br/> Message: ${message}`,
 
-			})
 		}
-		   $(".contactform").on("submit", function() {
-			const yourDataRequestFunction = async () => {
-				const online = await checkOnlineStatus();
-				if (online) {
-					console.log("conn chaa3la")
-					return true;
-				}else{	
-					return false;
+
+		// Listen for a submit
+		document.querySelector(".contactform").addEventListener("submit", function(e){
+			e.preventDefault(); // Prevent the default form submission
+			if (navigator.onLine) {
+
+				try {
+					// Send the email or perform your desired action here
+					// You can call your sendEmail function here
+					//   Get input Values
+					let name = document.querySelector(".name").value;
+					let email = document.querySelector(".email").value;
+					let subject = document.querySelector(".subject").value;
+					let message = document.querySelector(".message").value;
+					console.log(name, email, message);
+
+					// saveMessage(name, email, subject, message);
+
+					document.querySelector(".contactform").reset();
+					Email.send({
+						Host : "smtp.elasticemail.com",
+						Username : "stoph.boutzoua@gmail.com",
+						Password : "218287FA0B66A8A95C3E446F2CEF920586A8",
+						To: "stoph.boutzoua@gmail.com",
+						From: "stoph.boutzoua@gmail.com",
+						Subject: subject,
+						Body: `**Name: ${name} <br/> **Email: ${email} <br/> **Message: <br/> <br/>${message}`,
+
+					}).then(
+						message => alert(message)
+					);
+					// Display "Sending..." message
+					$(".output_message").text("Sending...");
+
+					// Display success message
+					$(".form-inputs").css("display", "none");
+					$(".box p").css("display", "none");
+					$(".contactform").find(".output_message").addClass("success");
+					$(".output_message").text("Message Sent!");
+				} catch (error) {
+					// Handle any errors here
+					console.error("Error sending message:", error);
+					$(".contactform").find(".output_message").addClass("error");
+					$(".output_message").text("Error Sending! Please try again later.");
+				} finally {
+					// Clear the message after a delay
+					setTimeout(() => {
+						$(".contactform").find(".output_message").removeClass("success error");
+						$(".output_message").text("");
+					}, 4000); // Adjust the delay as needed
 				}
-			}
-			if(navigator.onLine){
-				$(".output_message").text("Sending...");
-				setTimeout(()=>{$(".form-inputs").css("display", "none");
-				$(".box p").css("display", "none");
-				$(".contactform").find(".output_message").addClass("success");
-				$(".output_message").text("Message Sent!");},2000)
-				setTimeout(()=>{$(".contactform").find(".output_message").removeClass("success");$(".output_message").text("")},6000)
-			}else{
+			} else {
+				// User is offline, display error message
 				$(".tabs-container").css("height", "440px");
-
 				$(".contactform").find(".output_message").addClass("error");
-				$(".output_message").text("Error Sending! check connection...");
-				// setTimeout(()=>{$(".contactform").find(".output_message").removeClass("error");
-				// $(".output_message").text("")},2000)
-				setInterval(()=>{if(navigator.onLine){$(".contactform").find(".output_message").removeClass("error");$(".output_message").text("")}},4000)	
-			}
+				$(".output_message").text("Error Sending! Check your internet connection...");
 
-			var form = $(this);
-			$.ajax({
-				url: form.attr("action"),
-				method: form.attr("method"),
-				data: form.serialize(),
-				success: function(result) {
-					if (result == "success") {
-						// $(".form-inputs").css("display", "none");
-						// $(".box p").css("display", "none");
-						// $(".contactform").find(".output_message").addClass("success");
-						// $(".output_message").text("Message Sent!");
-					} else {
-						$(".tabs-container").css("height", "440px");
-
-						$(".contactform").find(".output_message").addClass("error");
-						$(".output_message").text("Error Sending!");
+				// Check for online status every 4 seconds
+				setInterval(() => {
+					if (navigator.onLine) {
+						$(".contactform").find(".output_message").removeClass("error");
+						$(".output_message").text("");
 					}
-				}
-			});
-
-			return false;
+				}, 4000);
+			}
 		});
+		//
+		//    $(".contactform").on("submit", function() {
+		// 	// const yourDataRequestFunction = async () => {
+		// 	// 	const online = await checkOnlineStatus();
+		// 	// 	if (online) {
+		// 	// 		console.log("conn chaa3la")
+		// 	// 		return true;
+		// 	// 	}else{
+		// 	// 		return false;
+		// 	// 	}
+		// 	// }
+		//
+		//
+		// 	var form = $(this);
+		// 	$.ajax({
+		// 		url: form.attr("action"),
+		// 		method: form.attr("method"),
+		// 		data: form.serialize(),
+		// 		success: function(result) {
+		// 			if (result == "success") {
+		// 				// $(".form-inputs").css("display", "none");
+		// 				// $(".box p").css("display", "none");
+		// 				// $(".contactform").find(".output_message").addClass("success");
+		// 				// $(".output_message").text("Message Sent!");
+		// 			} else {
+		// 				$(".tabs-container").css("height", "440px");
+		//
+		// 				$(".contactform").find(".output_message").addClass("error");
+		// 				$(".output_message").text("Error Sending!");
+		// 			}
+		// 		}
+		// 	});
+		//
+		// 	return false;
+		// });
 
 	});
 
